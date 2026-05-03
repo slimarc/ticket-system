@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Http\Requests\StorePriorityRequest;
 use App\Models\Priority;
 use Illuminate\Http\JsonResponse;

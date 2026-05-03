@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreSectorRequest;
 use App\Models\Sector;
 use Illuminate\Http\JsonResponse;
+
 
 class SectorController extends Controller
 {
