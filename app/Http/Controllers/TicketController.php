@@ -58,4 +58,31 @@ class TicketController extends Controller
 
         return response()->json(new TicketResource($ticket->load(['sector', 'priority'])));
     }
+        
+    public function index(Request $request): AnonymousResourceCollection
+    {
+        $tickets = Ticket::with(['sector', 'priority'])
+            ->when($request->sector_id, fn($q) => $q->where('sector_id', $request->sector_id))
+            ->when($request->priority_id, fn($q) => $q->where('priority_id', $request->priority_id))
+            ->when($request->status, fn($q) => $q->where('status', $request->status))
+            ->when($request->min_hours, fn($q) => $q
+                ->whereNotNull('started_at')
+                ->whereRaw(
+                    "EXTRACT(EPOCH FROM (COALESCE(finished_at, NOW()) - started_at)) / 3600 >= ?",
+                    [$request->min_hours]
+                )
+            )
+            ->when($request->max_hours, fn($q) => $q
+                ->whereNotNull('started_at')
+                ->whereRaw(
+                    "EXTRACT(EPOCH FROM (COALESCE(finished_at, NOW()) - started_at)) / 3600 <= ?",
+                    [$request->max_hours]
+                )
+            )
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return TicketResource::collection($tickets);
+    }
+  
 }
