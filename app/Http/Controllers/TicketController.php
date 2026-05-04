@@ -75,28 +75,28 @@ class TicketController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $tickets = Ticket::with(['sector', 'priority'])
-            ->when($request->input('sector_id'), fn($q) => 
+            ->when($request->filled('sector_id'), fn($q) => 
                 $q->where('sector_id', $request->input('sector_id'))
             )
-            ->when($request->input('priority_id'), fn($q) => 
+            ->when($request->filled('priority_id'), fn($q) => 
                 $q->where('priority_id', $request->input('priority_id'))
             )
-            ->when($request->input('status'), fn($q) => 
+            ->when($request->filled('status'), fn($q) => 
                 $q->where('status', $request->input('status'))
             )
-            ->when($request->input('min_hours'), function ($q) use ($request) {
+            ->when($request->filled('min_hours'), function ($q) use ($request) {
                 $q->whereNotNull('started_at')
-                  ->whereRaw(
-                      "EXTRACT(EPOCH FROM (COALESCE(finished_at, NOW()) - started_at)) / 3600 >= ?",
-                      [$request->input('min_hours')]
-                  );
+                ->whereRaw(
+                    "EXTRACT(EPOCH FROM (COALESCE(finished_at, NOW()) - started_at)) / 3600 >= ?",
+                    [$request->input('min_hours')]
+                );
             })
-            ->when($request->input('max_hours'), function ($q) use ($request) {
+            ->when($request->filled('max_hours'), function ($q) use ($request) {
                 $q->whereNotNull('started_at')
-                  ->whereRaw(
-                      "EXTRACT(EPOCH FROM (COALESCE(finished_at, NOW()) - started_at)) / 3600 <= ?",
-                      [$request->input('max_hours')]
-                  );
+                ->whereRaw(
+                    "EXTRACT(EPOCH FROM (COALESCE(finished_at, NOW()) - started_at)) / 3600 <= ?",
+                    [$request->input('max_hours')]
+                );
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
