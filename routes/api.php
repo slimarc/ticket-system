@@ -10,3 +10,4 @@ Route::apiResource('priorities', PriorityController::class)->only(['index', 'sto
 Route::apiResource('tickets', TicketController::class)->only(['index', 'store']);
 Route::put('tickets/{ticket}/checkin', [TicketController::class, 'checkin']);
 Route::put('tickets/{ticket}/checkout', [TicketController::class, 'checkout']);
+Route::put('tickets/{ticket}/cancel', [TicketController::class, 'cancel']);

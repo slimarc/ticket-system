@@ -105,4 +105,18 @@ class TicketController extends Controller
 
         return TicketResource::collection($tickets);
     }
+
+    public function cancel(Ticket $ticket): JsonResponse
+    {
+        try {
+            $ticket = $this->ticketService->cancel($ticket);
+
+            return response()->json($this->transform($ticket));
+
+        } catch (\DomainException $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 422);
+        }
+    }
 }

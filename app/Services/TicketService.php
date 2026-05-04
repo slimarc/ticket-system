@@ -55,4 +55,22 @@ class TicketService
 
         return $ticket;
     }
+
+    public function cancel(Ticket $ticket): Ticket
+    {
+        if ($ticket->status === TicketStatus::Closed) {
+            throw new \DomainException("Closed tickets cannot be cancelled.");
+        }
+
+        if ($ticket->status === TicketStatus::Cancelled) {
+            throw new \DomainException("Ticket already cancelled.");
+        }
+
+        $ticket->update([
+            'status' => TicketStatus::Cancelled,
+            'finished_at' => now(),
+        ]);
+
+        return $ticket;
+    }
 }
