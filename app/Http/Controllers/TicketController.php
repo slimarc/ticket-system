@@ -20,6 +20,13 @@ class TicketController extends Controller
         $this->ticketService = $ticketService;
     }
     
+    private function transform(Ticket $ticket): TicketResource
+    {
+        return new TicketResource(
+            $ticket->load(['sector', 'priority'])
+        );
+    }
+
     public function store(StoreTicketRequest $request): JsonResponse
     {
         $ticket = Ticket::create($request->validated());
@@ -30,20 +37,14 @@ class TicketController extends Controller
         );
     }
 
-    private function transform(Ticket $ticket): TicketResource
-    {
-        return new TicketResource(
-            $ticket->load(['sector', 'priority'])
-        );
-    }
-
     public function checkin(Ticket $ticket): JsonResponse
     {
         try {
             $ticket = $this->ticketService->checkin($ticket);
 
             return response()->json(
-                $this->transform($ticket)
+                $this->transform($ticket),
+                200
             );
 
         } catch (\DomainException $e) {
@@ -62,7 +63,8 @@ class TicketController extends Controller
             );
 
             return response()->json(
-                $this->transform($ticket)
+                $this->transform($ticket),
+                200
             );
 
         } catch (\DomainException $e) {

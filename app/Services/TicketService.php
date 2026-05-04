@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\Ticket;
 use App\Enums\TicketStatus;
+use App\Models\TicketTracking;
+use DomainException;
+
 
 class TicketService
 {
@@ -22,6 +25,11 @@ class TicketService
             'started_at' => now(),
         ]);
 
+        TicketTracking::create([
+            'ticket_id' => $ticket->id,
+            'action_type' => 'STARTED',
+        ]);
+
         return $ticket;
     }
 
@@ -37,6 +45,12 @@ class TicketService
             'status'      => TicketStatus::Closed,
             'finished_at' => now(),
             'solution'    => $solution,
+        ]);
+
+        TicketTracking::create([
+            'ticket_id' => $ticket->id,
+            'action_type' => 'FINISHED',
+            'notes' => $solution,
         ]);
 
         return $ticket;
