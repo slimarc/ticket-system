@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('sector_id')->constrained()->restrictOnDelete();
             $table->foreignId('priority_id')->constrained()->restrictOnDelete();
-            $table->string('status')->default('Open');
+            $table->string('status')->default('OPEN');
             $table->string('requester', 100)->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finished_at')->nullable();
