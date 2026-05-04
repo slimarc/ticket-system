@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Chamados</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0e0e0e;
+      --bg2:     #161616;
+      --bg3:     #1f1f1f;
+      --border:  #2a2a2a;
+      --border2: #333;
+      --text:    #e8e8e8;
+      --muted:   #6b6b6b;
+      --danger:  #e05454;
+      --success: #4ade80;
+      --warning: #f59e0b;
+      --mono:    'IBM Plex Mono', monospace;
+      --sans:    'IBM Plex Sans', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-dot {
+      width: 6px; height: 6px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    nav { display: flex; gap: 2px; }
+
+    nav button {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      padding: 6px 14px;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+
+    nav button:hover { color: var(--text); border-color: var(--border2); }
+    nav button.active { color: var(--text); background: var(--bg3); border-color: var(--border2); }
+
+    main { padding: 32px; max-width: 1200px; margin: 0 auto; }
+
+    section { display: none; }
+    section.active { display: block; }
+
+    .page-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .form-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { font-size: 11px; color: var(--muted); font-family: var(--mono); letter-spacing: 0.04em; }
+
+    input, select, textarea {
+      font-family: var(--sans);
+      font-size: 13px;
+      padding: 8px 12px;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      background: var(--bg3);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+      width: 180px;
+    }
+
+    input:focus, select:focus, textarea:focus { border-color: #555; }
+    textarea { width: 260px; height: 72px; resize: vertical; }
+    input[type=number] { width: 110px; }
+    select option { background: var(--bg3); }
+
+    .btn {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 9px 16px;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      background: var(--bg3);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+
+    .btn:hover { background: #2a2a2a; border-color: #444; }
+    .btn-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .btn-primary:hover { background: #ccc; border-color: #ccc; }
+    .btn-danger { color: var(--danger); border-color: #3a1e1e; background: #1e1010; }
+    .btn-danger:hover { background: #2a1515; }
+    .btn-success { color: var(--success); border-color: #1a3a2a; background: #0f1e15; }
+    .btn-success:hover { background: #152a1e; }
+    .btn-warning { color: var(--warning); border-color: #3a2800; background: #1e1500; }
+    .btn-warning:hover { background: #2a1e00; }
+    .btn-sm { padding: 5px 10px; font-size: 10px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { border-bottom: 1px solid var(--border2); }
+
+    th {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 400;
+    }
+
+    td { padding: 11px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; color: #ccc; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #181818; }
+    tr.overdue td { background: #1a1200; }
+    tr.overdue:hover td { background: #201600; }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .badge-open       { background: #0f1e2e; color: #60a5fa; border: 1px solid #1a3a5a; }
+    .badge-inprogress { background: #1e1500; color: #f59e0b; border: 1px solid #3a2800; }
+    .badge-closed     { background: #0f1e15; color: #4ade80; border: 1px solid #1a3a28; }
+    .badge-cancelled  { background: #1e0f0f; color: #f87171; border: 1px solid #3a1a1a; }
+
+    .overdue-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: #2a1800;
+      color: #f59e0b;
+      border: 1px solid #3a2200;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 8px;
+    }
+
+    .id-cell { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+    .time-cell { font-family: var(--mono); font-size: 12px; }
+    .time-over { color: var(--warning); }
+    .actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .pagination button {
+      font-family: var(--mono);
+      font-size: 11px;
+      padding: 5px 12px;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      background: var(--bg3);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .pagination button:hover:not(:disabled) { background: #2a2a2a; }
+    .pagination button:disabled { opacity: 0.3; cursor: not-allowed; }
+    .pagination button.current { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .pagination-info { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: auto; }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      padding: 12px 20px;
+      border-radius: 4px;
+      display: none;
+      z-index: 999;
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    #toast.ok  { background: #0f1e15; color: var(--success); border: 1px solid #1a3a28; display: block; }
+    #toast.err { background: #1e0f0f; color: var(--danger);  border: 1px solid #3a1a1a; display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    SISTEMA DE CHAMADOS
+  </div>
+  <nav>
+    <button class="active" onclick="switchTab('tickets', this)">Chamados</button>
+    <button onclick="switchTab('sectors', this)">Setores</button>
+    <button onclick="switchTab('priorities', this)">Prioridades</button>
+  </nav>
+</header>
+
+<main>
+  <div id="toast"></div>
+
+  <!-- CHAMADOS -->
+  <section id="tickets" class="active">
+    <div class="page-title">/ chamados</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Abrir chamado</div>
+        <div class="form-row">
+          <div class="field">
+            <label>Título</label>
+            <input id="t-title" style="width:220px" placeholder="Título do chamado">
+          </div>
+          <div class="field">
+            <label>Solicitante</label>
+            <input id="t-requester" placeholder="Nome">
+          </div>
+          <div class="field">
+            <label>Setor</label>
+            <select id="t-sector" style="width:150px"><option value="">Selecione...</option></select>
+          </div>
+          <div class="field">
+            <label>Prioridade</label>
+            <select id="t-priority" style="width:150px"><option value="">Selecione...</option></select>
+          </div>
+          <div class="field">
+            <label>Descrição</label>
+            <textarea id="t-description" placeholder="Opcional"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="openTicket()">Abrir</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Ações por ID</div>
+        <div class="form-row">
+          <div class="field">
+            <label>ID do chamado</label>
+            <input id="a-id" type="number" placeholder="ID">
+          </div>
+          <button class="btn btn-success" onclick="doCheckin()">Check-in</button>
+          <button class="btn btn-warning" onclick="doCancel()">Cancelar</button>
+          <div class="field">
+            <label>Solução</label>
+            <textarea id="a-solution" placeholder="Descreva a solução..."></textarea>
+          </div>
+          <button class="btn" onclick="doCheckout()">Checkout</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Filtros</div>
+      <div class="filter-row">
+        <div class="field">
+          <label>Setor</label>
+          <select id="f-sector" style="width:140px"><option value="">Todos</option></select>
+        </div>
+        <div class="field">
+          <label>Prioridade</label>
+          <select id="f-priority" style="width:140px"><option value="">Todas</option></select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="f-status" style="width:150px">
+            <option value="">Todos</option>
+            <option value="OPEN">Aberto</option>
+            <option value="IN_PROGRESS">Em andamento</option>
+            <option value="CLOSED">Finalizado</option>
+            <option value="CANCELLED">Cancelado</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Mín. horas</label>
+          <input id="f-min" type="number" step="0.5" min="0" placeholder="0">
+        </div>
+        <div class="field">
+          <label>Máx. horas</label>
+          <input id="f-max" type="number" step="0.5" min="0" placeholder="∞">
+        </div>
+        <button class="btn btn-primary" onclick="applyFilters()">Filtrar</button>
+        <button class="btn" onclick="clearFilters()">Limpar</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Título</th><th>Setor</th><th>Prioridade</th>
+            <th>Status</th><th>Tempo</th><th>Solução</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tickets-body">
+          <tr><td colspan="8" class="empty-state">Carregando...</td></tr>
+        </tbody>
+      </table>
+
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </section>
+
+  <!-- SETORES -->
+  <section id="sectors">
+    <div class="page-title">/ setores</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Novo setor</div>
+        <div class="form-row">
+          <div class="field"><label>Nome</label><input id="s-name" placeholder="ex: TI"></div>
+          <div class="field"><label>Descrição</label><input id="s-desc" placeholder="Opcional"></div>
+          <button class="btn btn-primary" onclick="createSector()">Criar</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Setores cadastrados</div>
+        <table>
+          <thead><tr><th>#</th><th>Nome</th><th>Descrição</th><th></th></tr></thead>
+          <tbody id="sectors-body"><tr><td colspan="4" class="empty-state">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIORIDADES -->
+  <section id="priorities">
+    <div class="page-title">/ prioridades</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Nova prioridade</div>
+        <div class="form-row">
+          <div class="field"><label>Nome</label><input id="p-name" placeholder="ex: Alta"></div>
+          <div class="field"><label>Horas estimadas</label><input id="p-hours" type="number" step="0.5" min="0.5"></div>
+          <div class="field">
+            <label>Cor</label>
+            <select id="p-color">
+              <option value="green">Verde</option>
+              <option value="yellow">Amarelo</option>
+              <option value="orange">Laranja</option>
+              <option value="red">Vermelho</option>
+              <option value="gray">Cinza</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="createPriority()">Criar</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Prioridades cadastradas</div>
+        <table>
+          <thead><tr><th>#</th><th>Nome</th><th>Horas est.</th><th>Cor</th><th></th></tr></thead>
+          <tbody id="priorities-body"><tr><td colspan="5" class="empty-state">Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div id="confirm-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;">
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:28px 32px;min-width:340px;max-width:420px;">
+      <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:12px;">Confirmação</div>
+      <div id="confirm-message" style="font-size:14px;color:var(--text);margin-bottom:24px;line-height:1.6;"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn" onclick="resolveConfirm(false)">Voltar</button>
+        <button class="btn btn-warning" onclick="resolveConfirm(true)">Confirmar cancelamento</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = 'http://localhost:8000/api';
+let currentPage = 1;
+let confirmResolve = null;
+
+function switchTab(name, btn) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'tickets')    { loadSectors(); loadPriorities(); loadTickets(1); }
+  if (name === 'sectors')    loadSectors();
+  if (name === 'priorities') loadPriorities();
+}
+
+function toast(text, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = text;
+  el.className = type;
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => el.style.display = 'none', 3500);
+}
+
+async function request(url, method = 'GET', body = null) {
+  const options = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }
+  };
+  if (body) options.body = JSON.stringify(body);
+  const response = await fetch(url, options);
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || data.error || 'Erro desconhecido');
+  return data;
+}
+
+function statusBadge(status) {
+  const map   = { 'OPEN':'badge-open', 'IN_PROGRESS':'badge-inprogress', 'CLOSED':'badge-closed', 'CANCELLED':'badge-cancelled' };
+  const label = { 'OPEN':'Aberto', 'IN_PROGRESS':'Em andamento', 'CLOSED':'Finalizado', 'CANCELLED':'Cancelado' };
+  return `<span class="badge ${map[status] || ''}">${label[status] || status}</span>`;
+}
+
+function rowActions(t) {
+  const actions = [];
+  if (t.status === 'OPEN') {
+    actions.push(`<button class="btn btn-success btn-sm" onclick="doCheckinById(${t.id})">Check-in</button>`);
+    actions.push(`<button class="btn btn-warning btn-sm" onclick="doCancelById(${t.id})">Cancelar</button>`);
+  }
+  if (t.status === 'IN_PROGRESS') {
+    actions.push(`<button class="btn btn-sm" onclick="promptCheckout(${t.id})">Checkout</button>`);
+    actions.push(`<button class="btn btn-warning btn-sm" onclick="doCancelById(${t.id})">Cancelar</button>`);
+  }
+  return `<div class="actions-cell">${actions.join('')}</div>`;
+}
+
+function buildQuery(page = 1) {
+  const params = new URLSearchParams();
+  params.append('page', page);
+  const s  = document.getElementById('f-sector').value;
+  const p  = document.getElementById('f-priority').value;
+  const st = document.getElementById('f-status').value;
+  const mn = document.getElementById('f-min').value;
+  const mx = document.getElementById('f-max').value;
+  if (s)  params.append('sector_id', s);
+  if (p)  params.append('priority_id', p);
+  if (st) params.append('status', st);
+  if (mn) params.append('min_hours', mn);
+  if (mx) params.append('max_hours', mx);
+  return '?' + params.toString();
+}
+
+function applyFilters() { loadTickets(1); }
+
+function clearFilters() {
+  ['f-sector','f-priority','f-status','f-min','f-max'].forEach(id => document.getElementById(id).value = '');
+  loadTickets(1);
+}
+
+function renderPagination(meta) {
+  const el = document.getElementById('pagination');
+  if (!meta || meta.last_page <= 1) { el.innerHTML = ''; return; }
+  let html = `<button ${meta.current_page === 1 ? 'disabled' : ''} onclick="loadTickets(${meta.current_page - 1})">←</button>`;
+  for (let i = 1; i <= meta.last_page; i++) {
+    html += `<button class="${i === meta.current_page ? 'current' : ''}" onclick="loadTickets(${i})">${i}</button>`;
+  }
+  html += `<button ${meta.current_page === meta.last_page ? 'disabled' : ''} onclick="loadTickets(${meta.current_page + 1})">→</button>`;
+  html += `<span class="pagination-info">${meta.from}–${meta.to} de ${meta.total}</span>`;
+  el.innerHTML = html;
+}
+
+async function loadTickets(page = currentPage) {
+  currentPage = page;
+  try {
+    const data = await request(`${API}/tickets${buildQuery(page)}`);
+    const tickets = data.data ?? data;
+    const tbody = document.getElementById('tickets-body');
+
+    if (!tickets.length) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Nenhum chamado encontrado</td></tr>';
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+
+    tbody.innerHTML = tickets.map(t => {
+      const overdue = t.overdue === true;
+      const elapsed = t.elapsed_hours !== null
+        ? `<span class="${overdue ? 'time-over' : ''}">${t.elapsed_hours}h</span> / ${t.estimated_hours}h`
+        : `— / ${t.estimated_hours}h`;
+      return `<tr class="${overdue ? 'overdue' : ''}">
+        <td class="id-cell">#${t.id}</td>
+        <td>${t.title}${overdue ? '<span class="overdue-tag">atrasado</span>' : ''}</td>
+        <td>${t.sector}</td>
+        <td>${t.priority}</td>
+        <td>${statusBadge(t.status)}</td>
+        <td class="time-cell">${elapsed}</td>
+        <td style="color:var(--muted);font-size:12px">${t.solution ?? '—'}</td>
+        <td>${rowActions(t)}</td>
+      </tr>`;
+    }).join('');
+
+    renderPagination(data.meta ?? null);
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function openTicket() {
+  try {
+    await request(`${API}/tickets`, 'POST', {
+      title:       document.getElementById('t-title').value,
+      sector_id:   document.getElementById('t-sector').value,
+      priority_id: document.getElementById('t-priority').value,
+      requester:   document.getElementById('t-requester').value,
+      description: document.getElementById('t-description').value
+    });
+    toast('Chamado aberto com sucesso.');
+    ['t-title','t-requester','t-description'].forEach(id => document.getElementById(id).value = '');
+  } catch (e) {
+    toast(e.message, 'err');
+  } finally {
+    await loadTickets(1);
+  }
+}
+
+async function doCheckin() {
+  const id = document.getElementById('a-id').value;
+  if (!id) { toast('Informe o ID do chamado.', 'err'); return; }
+  await doCheckinById(id);
+}
+
+async function doCheckinById(id) {
+  try {
+    await request(`${API}/tickets/${id}/checkin`, 'PUT');
+    toast('Chamado iniciado.');
+    await loadTickets(currentPage);
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function doCheckout() {
+  const id = document.getElementById('a-id').value;
+  if (!id) { toast('Informe o ID do chamado.', 'err'); return; }
+  try {
+    await request(`${API}/tickets/${id}/checkout`, 'PUT', {
+      solution: document.getElementById('a-solution').value
+    });
+    toast('Chamado finalizado.');
+    document.getElementById('a-solution').value = '';
+    await loadTickets(currentPage);
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+function promptCheckout(id) {
+  document.getElementById('a-id').value = id;
+  document.getElementById('a-solution').focus();
+  toast('Preencha a solução e clique em Checkout.');
+}
+
+function showConfirm(message) {
+  return new Promise(resolve => {
+    confirmResolve = resolve;
+    document.getElementById('confirm-message').textContent = message;
+    const overlay = document.getElementById('confirm-overlay');
+    overlay.style.display = 'flex';
+  });
+}
+
+function resolveConfirm(result) {
+  document.getElementById('confirm-overlay').style.display = 'none';
+  if (confirmResolve) confirmResolve(result);
+  confirmResolve = null;
+}
+
+async function doCancel() {
+  const id = document.getElementById('a-id').value;
+  if (!id) { toast('Informe o ID do chamado.', 'err'); return; }
+  await doCancelById(id);
+}
+
+async function doCancelById(id) {
+  const confirmed = await showConfirm(`Deseja cancelar o chamado #${id}? Esta ação não pode ser desfeita.`);
+  if (!confirmed) return;
+  try {
+    await request(`${API}/tickets/${id}/cancel`, 'PUT');
+    toast('Chamado cancelado.');
+    await loadTickets(currentPage);
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function loadSectors() {
+  try {
+    const data = await request(`${API}/sectors`);
+    document.getElementById('sectors-body').innerHTML = data.length
+      ? data.map(s => `<tr>
+          <td class="id-cell">#${s.id}</td><td>${s.name}</td>
+          <td style="color:var(--muted)">${s.description || '—'}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteSector(${s.id})">Excluir</button></td>
+        </tr>`).join('')
+      : '<tr><td colspan="4" class="empty-state">Nenhum setor cadastrado</td></tr>';
+
+    ['t-sector','f-sector'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const def = id === 'f-sector' ? '<option value="">Todos</option>' : '<option value="">Selecione...</option>';
+      el.innerHTML = def + data.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    });
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function createSector() {
+  try {
+    await request(`${API}/sectors`, 'POST', {
+      name: document.getElementById('s-name').value,
+      description: document.getElementById('s-desc').value
+    });
+    toast('Setor criado.');
+    document.getElementById('s-name').value = '';
+    document.getElementById('s-desc').value = '';
+    await loadSectors();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function deleteSector(id) {
+  try {
+    await request(`${API}/sectors/${id}`, 'DELETE');
+    toast('Setor excluído.');
+    await loadSectors();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function loadPriorities() {
+  try {
+    const data = await request(`${API}/priorities`);
+    document.getElementById('priorities-body').innerHTML = data.length
+      ? data.map(p => `<tr>
+          <td class="id-cell">#${p.id}</td><td>${p.name}</td>
+          <td class="time-cell">${p.estimated_hours}h</td>
+          <td style="color:var(--muted)">${p.color}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deletePriority(${p.id})">Excluir</button></td>
+        </tr>`).join('')
+      : '<tr><td colspan="5" class="empty-state">Nenhuma prioridade cadastrada</td></tr>';
+
+    ['t-priority','f-priority'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const def = id === 'f-priority' ? '<option value="">Todas</option>' : '<option value="">Selecione...</option>';
+      el.innerHTML = def + data.map(p => `<option value="${p.id}">${p.name} (${p.estimated_hours}h)</option>`).join('');
+    });
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function createPriority() {
+  try {
+    await request(`${API}/priorities`, 'POST', {
+      name: document.getElementById('p-name').value,
+      estimated_hours: document.getElementById('p-hours').value,
+      color: document.getElementById('p-color').value
+    });
+    toast('Prioridade criada.');
+    document.getElementById('p-name').value = '';
+    document.getElementById('p-hours').value = '';
+    await loadPriorities();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+async function deletePriority(id) {
+  try {
+    await request(`${API}/priorities/${id}`, 'DELETE');
+    toast('Prioridade excluída.');
+    await loadPriorities();
+  } catch (e) { toast(e.message, 'err'); }
+}
+
+loadSectors();
+loadPriorities();
+loadTickets(1);
+</script>
+</body>
+</html>
