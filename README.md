@@ -1,58 +1,121 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎫 Ticket System API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de gerenciamento de chamados com controle de status, prioridade, setores e rastreamento de execução.
 
-## About Laravel
+Projeto desenvolvido com foco em praticar arquitetura de API, regras de negócio e fluxo de estados de chamados.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Tecnologias
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8+
+- Laravel
+- PostgreSQL
+- Docker
+- HTML + Vanilla JS 
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 📌 Funcionalidades
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🎟️ Tickets
+- Criar chamados (title, description, requester, sector e priority)
+- Listagem de tickets com paginação
+- Filtro por:
+  - setor
+  - prioridade
+  - status
+  - tempo estimado (min/max horas)
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 🔄 Fluxo de status
+- OPEN → chamado aberto
+- IN_PROGRESS → chamado em atendimento (check-in)
+- CLOSED → chamado finalizado (checkout com solução)
+- CANCELLED → chamado cancelado
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### ⏱️ Controle de tempo 
+- Cálculo de tempo decorrido do ticket
+- Comparação com tempo estimado da prioridade
+- Destaque de chamados em atraso
 
-```bash
-composer require laravel/boost --dev
+---
 
-php artisan boost:install
+### 🧭 Check-in / Check-out
+- Check-in inicia atendimento e registra `started_at`
+- Check-out finaliza chamado e registra:
+  - `finished_at`
+  - `solution`
+
+---
+
+### 🏢 Setores
+- Cadastro de setores
+- Associação de tickets a setores
+
+---
+
+### ⚡ Prioridades
+- Cadastro de prioridades
+- Definição de tempo estimado (SLA em horas)
+- Cor associada à prioridade
+
+---
+
+### 📊 Tracking 
+- Registro de eventos do ticket:
+  - STARTED (check-in)
+  - FINISHED (check-out)
+- Base para auditoria e rastreabilidade
+
+---
+
+## 🌐 Endpoints principais
+
+Todos endpoints no arquivo postman em 
+
+```
+docs/postman 
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 🧪 Frontend 
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Inclui uma interface simples em HTML para:
 
-## Code of Conduct
+- Criar tickets
+- Executar check-in / check-out
+- Visualizar lista de tickets
+- Destacar tickets em atraso 
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🐳 Executando com Docker
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+docker-compose up -d --build
+```
 
-## License
+A API ficará disponível em:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+http://localhost:8000
+```
+
+Frontend disponível em:
+
+```bash
+http://localhost:8000/index.html
+```
+
+---
+
+## 📌 Observações
+
+- O sistema utiliza enums para controle de status dos tickets
+- Regras de negócio estão centralizadas em Services
+- O tracking serve para auditoria de ações no ticket
+- O cálculo de SLA é baseado em diferença entre started_at e finished_at
+- Existem seeders que populam o banco de dados

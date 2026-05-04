@@ -1,0 +1,302 @@
+{
+  "info": {
+    "_postman_id": "36bd6e85-e065-43e1-8ad9-a03ad3c337bd",
+    "name": "Ticket System API",
+    "description": "Collection for Ticket System API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "31735218",
+    "_collection_link": "https://go.postman.co/collection/31735218-36bd6e85-e065-43e1-8ad9-a03ad3c337bd?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Sectors",
+      "item": [
+        {
+          "name": "List Sectors",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/sectors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sectors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Sector",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"IT\",\r\n    \"description\":\"Tech support\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/sectors",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sectors"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Sector",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sectors/{{sector_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sectors",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Priorities",
+      "item": [
+        {
+          "name": "List Priorities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/priorities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "priorities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Priority",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\":\"High\",\r\n    \"estimated_hours\":2,\r\n    \"color\":\"red\"\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/priorities",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "priorities"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Priority",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/priorities/{{priority_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "priorities",
+                "{{priority_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "List Tickets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tickets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Filter Tickets",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tickets?status=OPEN&sector_id={{sector_id}}&priority_id={{priority_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "OPEN"
+                },
+                {
+                  "key": "sector_id",
+                  "value": "{{sector_id}}"
+                },
+                {
+                  "key": "priority_id",
+                  "value": "{{priority_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ticket",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"title\":\"Test\",\r\n    \"description\":\"Desc\",\r\n    \"requester\":\"User\",\r\n    \"sector_id\":{{sector_id}},\r\n    \"priority_id\":{{priority_id}}\r\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkin Ticket",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets/{{ticket_id}}/checkin",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "{{ticket_id}}",
+                "checkin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Checkout Ticket",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"solution\":\"Fixed issue\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tickets/{{ticket_id}}/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tickets",
+                "{{ticket_id}}",
+                "checkout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api"
+    }
+  ]
+}
